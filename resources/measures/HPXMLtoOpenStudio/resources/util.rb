@@ -706,7 +706,7 @@ class OutputMeters
       if plant_loop.name.to_s == Constants.PlantLoopDomesticWater(unit.name.to_s)
         water_heater = Waterheater.get_water_heater(model, plant_loop, runner)
 
-        if water_heater.is_a? OpenStudio::Model::WaterHeaterMixed
+        if water_heater.is_a? OpenStudio::Model::WaterHeaterMixed or OpenStudio::Model::WaterHeaterStratified
           custom_meter_infos["#{unit.name}:ElectricityWaterSystems"]["key_var_groups"] << ["#{water_heater.name}", "Water Heater Off Cycle Parasitic Electric Energy"]
           custom_meter_infos["#{unit.name}:ElectricityWaterSystems"]["key_var_groups"] << ["#{water_heater.name}", "Water Heater On Cycle Parasitic Electric Energy"]
           next if water_heater.heaterFuelType != "Electricity"
