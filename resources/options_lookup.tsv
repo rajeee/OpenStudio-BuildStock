@@ -2968,3 +2968,4 @@ Geometry Perimeter Footprint Ratio	0.15
 Geometry Perimeter Footprint Ratio	0.17																																																	
 Geometry Perimeter Footprint Ratio	0.19																																																	
 Geometry Perimeter Footprint Ratio	0.21																																																	
+Window to Wall Ratio	Test Option	Set Window to Wall Ratio by Facade	wwr=0.4	sillHeight=30	facade=North	exl_spaces_not_incl_fl_area=true	split_at_doors=Split Walls at Doors	inset_tri_sub=true	triangulate=true																																									
