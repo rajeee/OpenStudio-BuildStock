@@ -1,6 +1,6 @@
 # TODO: Need to handle vacations
 require_relative "unit_conversions"
-
+srand(1)
 # Annual schedule defined by 12 24-hour values for weekdays and weekends.
 class HourlyByMonthSchedule
   # weekday_month_by_hour_values must be a 12-element array of 24-element arrays of numbers.
@@ -607,7 +607,8 @@ class HotWaterSchedule
 
     # Read data into minute array
     skippedheader = false
-    min_shift = 24 * 60 * (days_shift % 365) # For MF homes, shift each unit by an additional week
+    days_shift += rand(200)*365
+    min_shift = 24 * 60 * (days_shift) # For MF homes, shift each unit by an additional week
     items = [0] * minutes_in_year
     File.open(minute_draw_profile).each do |line|
       linedata = line.strip.split(',')
@@ -617,7 +618,8 @@ class HotWaterSchedule
       end
       shifted_minute = linedata[0].to_i - min_shift
       if shifted_minute < 0
-        stored_minute = shifted_minute + minutes_in_year
+        next
+        # stored_minute = shifted_minute + minutes_in_year
       else
         stored_minute = shifted_minute
       end
