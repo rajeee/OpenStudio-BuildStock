@@ -538,7 +538,7 @@ class HotWaterSchedule
     end
 
     timestep_minutes = (60 / @model.getTimestep.numberOfTimestepsPerHour).to_i
-    weeks = 1 # use a single week that repeats
+    weeks = 52 # use a single week that repeats
 
     data = loadMinuteDrawProfileFromFile(timestep_minutes, days_shift, weeks)
     @totflow, @maxflow, @ontime = loadDrawProfileStatsFromFile()
@@ -602,7 +602,7 @@ class HotWaterSchedule
       return nil
     end
 
-    minutes_in_year = 8760 * 60
+    minutes_in_year = 8784 * 60
     weeks_in_minutes = weeks * 7 * 24 * 60
 
     # Read data into minute array
@@ -623,9 +623,9 @@ class HotWaterSchedule
       end
       value = linedata[1].to_f
       items[stored_minute.to_i] = value
-      if shifted_minute >= weeks_in_minutes
-        break # no need to process more data
-      end
+      # if shifted_minute >= weeks_in_minutes
+      #   break # no need to process more data
+      # end
     end
 
     # Aggregate minute schedule up to the timestep level to reduce the size
@@ -634,9 +634,9 @@ class HotWaterSchedule
       timestep_items = items[tstep * timestep_minutes, timestep_minutes]
       avgitem = timestep_items.reduce(:+).to_f / timestep_items.size
       data.push(avgitem)
-      if (tstep + 1) * timestep_minutes > weeks_in_minutes
-        break # no need to process more data
-      end
+      # if (tstep + 1) * timestep_minutes > weeks_in_minutes
+      #   break # no need to process more data
+      # end
     end
 
     return data
@@ -710,9 +710,8 @@ class HotWaterSchedule
     schedule.setName(@sch_name)
 
     schedule_rules = []
-    for d in 1..7 * weeks # how many unique day schedules
+    for d in 1..num_days_in_year # how many unique day schedules
       next if d > num_days_in_year
-
       rule = OpenStudio::Model::ScheduleRule.new(schedule)
       rule.setName(@sch_name + " #{Schedule.allday_name} ruleset#{d}")
       day_schedule = rule.daySchedule
@@ -727,12 +726,8 @@ class HotWaterSchedule
       end
       Schedule.set_weekday_rule(rule)
       Schedule.set_weekend_rule(rule)
-      for w in 0..52 # max num of weeks
-        next if d + (w * 7 * weeks) > num_days_in_year
-
-        date_s = OpenStudio::Date::fromDayOfYear(d + (w * 7 * weeks), assumed_year)
-        rule.addSpecificDate(date_s)
-      end
+      date_s = OpenStudio::Date::fromDayOfYear(d, assumed_year)
+      rule.addSpecificDate(date_s)
     end
 
     Schedule.set_schedule_type_limits(@model, schedule, @schedule_type_limits_name)
