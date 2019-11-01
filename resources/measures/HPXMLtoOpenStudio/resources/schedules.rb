@@ -699,7 +699,6 @@ class HotWaterSchedule
 
     sch_file_name = @sch_name + '.csv'
     File.write(sch_file_name, data.to_csv)
-    external_file = OpenStudio::Model::ExternalFile.new(sch_file_name)
     year_description = @model.getYearDescription
     assumed_year = year_description.assumedYear
     num_days_in_year = Constants.NumDaysInYear(year_description.isLeapYear)
