@@ -697,6 +697,9 @@ class HotWaterSchedule
       return nil
     end
 
+    sch_file_name = @sch_name + '.csv'
+    File.write(sch_file_name, data.to_csv)
+    external_file = OpenStudio::Model::ExternalFile.new(sch_file_name)
     year_description = @model.getYearDescription
     assumed_year = year_description.assumedYear
     num_days_in_year = Constants.NumDaysInYear(year_description.isLeapYear)
@@ -706,32 +709,10 @@ class HotWaterSchedule
       time[i] = OpenStudio::Time.new(0, 0, m, 0)
     end
 
-    schedule = OpenStudio::Model::ScheduleRuleset.new(@model)
-    schedule.setName(@sch_name)
-
-    schedule_rules = []
-    for d in 1..num_days_in_year # how many unique day schedules
-      next if d > num_days_in_year
-      rule = OpenStudio::Model::ScheduleRule.new(schedule)
-      rule.setName(@sch_name + " #{Schedule.allday_name} ruleset#{d}")
-      day_schedule = rule.daySchedule
-      day_schedule.setName(@sch_name + " #{Schedule.allday_name}#{d}")
-      previous_value = data[(d - 1) * 24 * 60 / timestep_minutes]
-      time.each_with_index do |m, i|
-        if i != time.length - 1
-          next if data[i + 1 + (d - 1) * 24 * 60 / timestep_minutes] == previous_value
-        end
-        day_schedule.addValue(m, previous_value)
-        previous_value = data[i + 1 + (d - 1) * 24 * 60 / timestep_minutes]
-      end
-      Schedule.set_weekday_rule(rule)
-      Schedule.set_weekend_rule(rule)
-      date_s = OpenStudio::Date::fromDayOfYear(d, assumed_year)
-      rule.addSpecificDate(date_s)
-    end
-
-    Schedule.set_schedule_type_limits(@model, schedule, @schedule_type_limits_name)
-
+    #ScheduleRuleset.new(@model)
+    external_file = OpenStudio::Model::ExternalFile::getExternalFile(model, sch_file_name)
+    external_file = external_file.get
+    schedule = OpenStudio::Model::ScheduleFile.new(external_file)
     return schedule
   end
 end
