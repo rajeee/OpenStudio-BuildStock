@@ -709,7 +709,7 @@ class HotWaterSchedule
     end
 
     #ScheduleRuleset.new(@model)
-    external_file = OpenStudio::Model::ExternalFile::getExternalFile(model, sch_file_name)
+    external_file = OpenStudio::Model::ExternalFile::getExternalFile(@model, sch_file_name)
     external_file = external_file.get
     schedule = OpenStudio::Model::ScheduleFile.new(external_file)
     return schedule
